@@ -21,7 +21,7 @@ int main(int argc, char **argv){
   long indexSize = ftell(archivo1);
   int linea1Size = 50*sizeof(char) + sizeof(int);
 
-  /**Testing
+  /********* line1Size Testing *************
   char ejemplo[50];
   fseek(archivo1, 0, SEEK_SET);
   fread(ejemplo, sizeof(char), 50, archivo1);
@@ -34,6 +34,7 @@ int main(int argc, char **argv){
 	int start = 0;
 	int end = indexSize / linea1Size;
   int mid = (start+ end)/2;
+  int exists = 0;
   while(start <= end){
     char palabraBin[50];
     fseek(archivo1, mid * linea1Size, SEEK_SET);
@@ -57,19 +58,20 @@ int main(int argc, char **argv){
 
   if(start>end){
     printf("No pudimos encontrar la palabra %s \n", buscarPalabra);
+    exists=1;
   }
 
-
-  FILE *archivo2 = fopen("record2.bin","rb");
-  int renglon[2];
-  registro2--;
-  while(renglon[1] != -1){
-    fseek(archivo2, registro2 * 2 *sizeof(int), SEEK_SET);
-    fread(renglon, sizeof(int),2, archivo2);
-    printf("La palabra «%s» se encuentra en la línea: %d \n", buscarPalabra, renglon[0]);
-    registro2++;
+if(exists == 0){
+    FILE *archivo2 = fopen("record2.bin","rb");
+    int renglon[2];
+    registro2--;
+    while(renglon[1] != -1){
+      fseek(archivo2, registro2 * 2 *sizeof(int), SEEK_SET);
+      fread(renglon, sizeof(int),2, archivo2);
+      printf("La palabra «%s» se encuentra en la línea: %d \n", buscarPalabra, renglon[0]);
+      registro2++;
+    }
+    fclose(archivo2);
   }
-  fclose(archivo2);
-  
   return 0;
 }
