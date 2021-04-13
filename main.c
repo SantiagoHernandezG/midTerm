@@ -7,6 +7,7 @@
 #include <sys/wait.h>
 
 #define DATA_SIZE 4
+/******************** STRUCTURES ***********************/
 
 typedef struct Record1
 {
@@ -20,11 +21,6 @@ typedef struct Record2
 	int line; // linea en el archivo .txt
 	int next; // sig posicion dentro del archivo2
 } record2;
-typedef struct lista {
-    int line;
-    int sig;
-    struct node * next;
-} node_t;
 
 
 void displayfile1(struct Record1 record1[], struct Record1 arregloAux2[]);
@@ -34,10 +30,7 @@ void bsortDesc(struct Record1 Record1[]);
 void quitarRepetidos(struct Record1 Record1[]);
 int buscaBin(struct Record1 record1[], int l, int r, int x);
 
-typedef struct palabraAux
-{
-	char wordAux[50];
-} palabraAux;
+
 
 int main()
 {
