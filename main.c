@@ -106,6 +106,7 @@ int main()
 	}
 	//Ordenar, quitar repeticion y escribir en archivo
 	bsortDesc(arregloAux);
+  bsortDesc(arregloAux2);
   display(arregloAux, record2);
 	quitarRepetidos(arregloAux);
 	displayfile1(arregloAux,arregloAux2);
@@ -137,21 +138,22 @@ struct Record1 arregloAux2[26477])
 	{
     aux = 0;
 		fputs(arregloAux[i].word, fPtr);
-		fputs(" ", fPtr);    
+		fputs(" ", fPtr);
+    //fputs(arregloAux2[i].word, fPtr);    
     counter = 0;
-    for (int j = 0; j < 26477; j++)
+    /*for (int j = 0; j < 26477; j++)
     //arregloaux youth -->904
   //record 2 linea --> 904
     {
     //if(arregloAux[i].ptr == record2[j].line)
     //{
-      if(strcmp(arregloAux[i].word, arregloAux2[j+1].word) != 0){
+      if(strcmp(arregloAux[i].word, arregloAux2[j].word) != 0){
           counter++;
       }
        fprintf(fPtr,"%d ", counter);
        fprintf(fPtr,"%d ", j+ 1);
     //}
-    }
+    }*/
      
 
     fputs("\n", fPtr);

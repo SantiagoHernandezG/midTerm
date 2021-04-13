@@ -1,2 +1,2 @@
 language = "c"
-run = "gcc main.c -o main"
+run = "gcc main.c -o main.out"
