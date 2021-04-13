@@ -7,8 +7,10 @@
 #include <sys/wait.h>
 
 #define DATA_SIZE 4
-/******************** STRUCTURES ***********************/
-
+/*
+Pedro Demian Godinez Cruz A01657025
+Santiago Hernandez Guerrero A0127543
+*/
 typedef struct Record1
 {
 	char word[50]; // palabra o llave
@@ -21,6 +23,11 @@ typedef struct Record2
 	int line; // linea en el archivo .txt
 	int next; // sig posicion dentro del archivo2
 } record2;
+typedef struct lista {
+    int line; //linea de la palabra
+    int sig; //siguiente registro en la lista
+    struct node * next;
+} node_t;
 
 
 void displayfile1(struct Record1 record1[], struct Record1 arregloAux2[]);
@@ -30,7 +37,10 @@ void bsortDesc(struct Record1 Record1[]);
 void quitarRepetidos(struct Record1 Record1[]);
 int buscaBin(struct Record1 record1[], int l, int r, int x);
 
-
+typedef struct palabraAux
+{
+	char wordAux[50];
+} palabraAux;
 
 int main()
 {
@@ -45,27 +55,27 @@ int main()
 	char ch;
 	int characters, no_palabra, no_linea, pos2;
 
-	/* Open source files in 'r' mode */
+
 	file = fopen("alice.txt", "r");
-	/* Check if file opened successfully */
+	
 	if (file == NULL)
 	{
 		printf("\nNo existe el archivo.\n");
 		exit(EXIT_FAILURE);
 	}
 	/*
-     * Logic to count characters, no_palabra and no_linea.
+     * Logica ver no_palabra and no_linea.
      */
 	characters = no_palabra = no_linea = pos2 = 0;
 	while ((ch = fgetc(file)) != EOF)
 	{
 		characters++;
-		/* Check new line */
+		/* Checar nueva line */
 		if (ch == '\n' || ch == '\0')
 		{
 			no_linea++;
 		}
-		/* Check no_palabra */
+		/* Checar no_palabra */
 		if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\0')
 			fscanf(file, "%s", word);
 		no_palabra++;
@@ -73,13 +83,13 @@ int main()
 		int i = 0;
 		while (i < strlen(word))
 		{
-			//Remove punctuation
-			if (strchr("`.;,!?:--'", word[i]))
+			//Quitar punctuación
+			if (strchr("`().;,!?:--'", word[i]))
 				memmove(&word[i], &word[i + 1], strlen(word) - i);
 			else
 				i++;
 		}
-		//Lower case it
+		//Pasarlo a minisculas
 		for (int i = 0; word[i]; i++)
 		{
 			word[i] = tolower(word[i]);
@@ -91,21 +101,19 @@ int main()
 		arregloAux2[no_palabra].ptr = no_linea;
     record2[no_palabra].line = no_linea;
 	}
-	/* Increment no_palabra and no_linea for last word */
+	/* Incrementar no_palabra and no_linea para la ultima palabra */
 	if (characters > 0)
 	{
 		no_palabra++;
 		no_linea++;
 	}
-	//Ordenar, quitar repeticion y escribir en archivo
+	//Metodos para crear los archivos
 	bsortDesc(arregloAux);
   bsortDesc(arregloAux2);
   display(arregloAux, record2);
 	quitarRepetidos(arregloAux);
 	displayfile1(arregloAux,arregloAux2);
     
-
-	/* Close files to release resources */
 	fclose(file);
 	return 0;
 }
@@ -118,49 +126,43 @@ struct Record1 arregloAux2[26477])
 
 	int i, s;
   int aux = 0;
+  int pos = 0;
   int counter = 0;
-	fPtr = fopen("record1.txt", "wb");
+	fPtr = fopen("record1.bin", "wb");
 
-	/* Check if file opened successfully */
+	
 	if (fPtr == NULL && fPtr == NULL)
 	{
 		printf("\nNo existe el archivo.\n");
 		exit(EXIT_FAILURE);
 	}
-	for (i = 0; i < 2896; i++)
-	{
-    aux = 0;
-		fputs(arregloAux[i].word, fPtr);
-		fputs(" ", fPtr);
-    //fputs(arregloAux2[i].word, fPtr);    
-    counter = 0;
-    /*for (int j = 0; j < 26477; j++)
-    //arregloaux youth -->904
-  //record 2 linea --> 904
+    for (int j = 1; j < 26477; j++)
+
     {
-    //if(arregloAux[i].ptr == record2[j].line)
-    //{
-      if(strcmp(arregloAux[i].word, arregloAux2[j].word) != 0){
-          counter++;
+      
+      if(strcmp(arregloAux2[j].word, arregloAux2[j+1].word) == 0){
+      counter++;
+      aux++;
       }
-       fprintf(fPtr,"%d ", counter);
-       fprintf(fPtr,"%d ", j+ 1);
-    //}
-    }*/
-     
+      else{
+      counter++;
+      fwrite(&arregloAux2[j].word, 50, 1, fPtr);
 
-    fputs("\n", fPtr);
-	}
+      pos = counter -aux;
+      fwrite(&pos, 4, 1, fPtr);
+
+      aux = 0;
+      }
+      }
 	fclose(fPtr);
- 
 }
-
-
+    
+ 
 void display(struct Record1 arregloAux[26477], struct Record2 record2[26477])
 {
   FILE *fPtr;
 	int i,j,k;
-	fPtr = fopen("record2.txt", "wb");
+	fPtr = fopen("record2.bin", "wb");
     if (fPtr == NULL && fPtr)
 	{
 		printf("\nNo existe el archivo.\n");
@@ -168,25 +170,19 @@ void display(struct Record1 arregloAux[26477], struct Record2 record2[26477])
 	}
     for (i = 1; i < 26477; i++)
     {
-      printf("%d", i);
-      printf(" ");
-      printf("%s\t%d", arregloAux[i].word, arregloAux[i].ptr);
-      printf("\n");
       record2[i].line = arregloAux[i].ptr;
       record2[i].next = i;
-      //fprintf(fPtr, "%s ", arregloAux[i].word);
-      //fputs(" ", fPtr);
-      fprintf(fPtr, "%d ", record2[i].line);
-      fputs(" ", fPtr);
+    
+      fwrite(&record2[i].line, 4, 1, fPtr);
+
       if(strcmp(arregloAux[i].word, arregloAux[i+1].word) == 0){
         record2[i].next++;
-        fprintf(fPtr, "%d ", record2[i].next);
-        fputs("\n", fPtr);
+        fwrite(&record2[i].next, 4, 1, fPtr);
+
       }
       else{
       record2[i].next = -1;
-      fprintf(fPtr, "%d ", record2[i].next);
-      fputs("\n", fPtr);
+      fwrite(&record2[i].next, 4, 1, fPtr);
       }
       }
        
@@ -219,63 +215,21 @@ void quitarRepetidos(struct Record1 record1[])
 	{
 		for (int j = i + 1; j < size; j++)
 		{
-			/* If any duplicate found */
+			/* Si hay duplicados  */
 			if (strcmp(record1[i].word, record1[j].word) == 0)
 			{
-				/* Delete the current duplicate element */
+				/* Borrar el duplicado */
 				for (int k = j; k < size; k++)
 				{
 					strcpy(record1[k].word, record1[k + 1].word);
 					record1[k].ptr = record1[k + 1].ptr;
 				}
-				/* Decrement size after removing duplicate element */
+				/* Decrementar el tamaño del array */
 				size--;
-				/* If shifting of elements occur then don't increment j */
+				/* Si son iguales, no incrementar j */
 				j--;
 			}
 		}
 	}
 }
-int buscaBin(struct Record1 arregloAux[], int l, int r, int x){
-    int num;
-    char ch;
-   FILE *fptr;
 
-   if ((fptr = fopen("record1.txt","r")) == NULL){
-       printf("Error! opening file");
-       // Program exits if the file pointer returns NULL.
-       exit(1);
-   }	while ((ch = fgetc(fptr)) != EOF)
-	{
-   
-   //fscanf(fptr,"%d", &num);
-   //printf("Se encontro la palabra: =%d", num);
-   fclose(fptr); 
-   return -1;  
-
-  }
-  return 0;
-}
-
-
-
-/*
-void displayfile2(struct Record2 record2[26477])
-{
-	FILE *fPtr;
-	int i, s;
-	fPtr = fopen("record2.txt", "wb");
-  
-	 Check if file opened successfully 
-	if (fPtr == NULL && fPtr)
-	{
-		printf("\nNo existe el archivo.\n");
-		exit(EXIT_FAILURE);
-	}
-	for (i = 0; i < 26477; i++)
-	{
-		fprintf(fPtr, "%d ", record2[i].line);
-		fputs("\n", fPtr);
-	}
-	fclose(fPtr);
-}*/
